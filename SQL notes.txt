@@ -1,0 +1,57 @@
+Column Restricting query - Having specific coloumn name instead of using * 
+	ex. SELECT first_name,last_name FROM employees;
+Row Restricting Query - Having where clause
+	ex. SELECT * FROM employees WHERE department_id=60;
+----------------------------------------------------------------------------------------------------------------------
+
+ex. SELECT * from employees where commission_pct is not null
+	AND first_name like 's_n%'				-- % REPRESENTS any combination of letters
+	order by first_name desc, last_name desc;		-- _ REPRESENTS single unknown letter
+
+----------------------------------------------------------------------------------------------------------------------
+	ASSESSMENT PATTERN
+		100 Marks Total
+			30 marks for MCQ
+			70 marks for queries
+				3 	10 marks (easy)
+				2	12.5 marks (avg)
+				1 	15 marks (complex)
+
+
+----------------------------------------------------------------------------------------------------------------------
+			PRACTICE QUESTIONS
+use hr;
+
+show tables;
+
+select * from employees;
+
+-- Display the first name and join date of the employees who joined between 1998 and 2000.
+SELECT first_name,hire_date from employees where YEAR(hire_date) between 1998 and 2000;
+
+-- Display first name and join date of the employees who is either IT Programmer or Sales Man
+SELECT first_name,hire_date from employees where job_id='IT_PROG' OR job_id='SA_MAN';
+
+--  Display all details of employees whose employee id is 100 and 150
+SELECT * from employees where employee_id between 100 and 150;
+
+-- Display first name, last name and salary of all employees who is earning less than 10000
+SELECT first_name,last_name,salary from employees where salary<10000;
+
+-- Display all details of the employees sorted based on their job_id,
+SELECT * from employees order by job_id;
+
+-- Display all details of the employees whose first name and last name start with S
+SELECT * from employees where first_name like 's%' and last_name like 's%';
+
+-- Display all the details of the employees who earn more than 21000
+SELECT * from employees where salary>21000;
+
+-- Display all the details of the employees who earn between 5000 and 10000
+SELECT * from employees where salary between 5000 and 10000;
+
+-- Display all the details of the employees who earn between 5000 and 10000 and all of them belong to department id 30
+SELECT * from employees where department_id = 30 and salary between 5000 and 10000;
+
+-- Display the employees first name and sum of salary and commission_pct.
+SELECT first_name, salary+IFNULL(commission_pct, 0) as SUM from employees group by first_name;
