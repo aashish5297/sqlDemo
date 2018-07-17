@@ -55,3 +55,189 @@ SELECT * from employees where department_id = 30 and salary between 5000 and 100
 
 -- Display the employees first name and sum of salary and commission_pct.
 SELECT first_name, salary+IFNULL(commission_pct, 0) as SUM from employees group by first_name;
+
+
+
+---------------------------------------------------------------------------------------------------------------------
+
+		TYPES OF DATABASES
+
+	- Document-oriented Database
+	- Embedded Database
+	- Graph Database
+	- Hypertext Database
+	- Operational Database
+	- Distribured Databse
+ 	- Flat-file
+
+		WHAT IS A DBMS
+
+	-It is a collection of interrelated data
+	-Set of programs to access the data
+	-Contains information about a particular enterprise
+	-Provides environment that is both convient and efficient to use
+	-defines rule to validate and manipulate te data
+	-it relieves uses of framing programs for data maintenance.
+
+		Three level DBMS Architecture
+
+	- Internal level - how data is actually stored in physical devices
+	- Conceptual level - connects views, it contains all major entities 
+	- External level - views from the users
+
+		ACID PROPERTIES
+
+	- ATOMICITY - stats a transaction is an indivisible unit that is 
+			either performed as a whole not in part, or either unperformed at all
+
+	- CONSISTENCY - Transaction must alter the databse from one state to another
+
+	- ISLOATION - Transactions must be executed independently of one another
+ 
+	- DURABILITY - 
+
+		DATA MODEL
+
+	- THE CONCEPTUAL MODEL - it contains all major entities(TABLES)
+	- THE LOGICAL MODEL - it contains all attributes(COLUMNS)
+	- THE PHYSICAL MODEL - you actually create here
+
+
+----------------------------------------------------------------------------------------------------------------------
+						EXERCISE
+----------------------------------------------------------------------------------------------------------------------
+
+SHOW TABLES;
+DESC account_master;
+DESC branch_master;
+DESC customer_master;
+DESC loan_details;
+DESC transaction_details;
+
+SELECT * FROM transaction_details;
+SELECT * FROM branch_master;
+SELECT * FROM customer_master;
+SELECT * FROM account_master;
+SELECT * FROM loan_details;
+
+-- Write a query to display account number, customer’s number, customer’s firstname,lastname,
+-- account opening date.
+-- Display the records sorted in ascending order based on account number.
+
+        SELECT A.account_number,A.customer_number,FIRSTNAME,LASTNAME,account_opening_date 
+            FROM account_master A 
+                INNER JOIN customer_master C 
+                    ON A.customer_number=C.customer_number;
+
+-- Write a query to display the number of customer’s from Delhi. 
+-- Give the count an alias name of Cust_Count
+
+        SELECT COUNT(*) AS CUST_COUNT 
+            FROM customer_master 
+                WHERE customer_city='DELHI';
+
+-- Write a query to display  the customer number, customer firstname,account number for the 
+-- customer’s whose accounts were created after 15th of any month.
+-- Display the records sorted in ascending order based on customer number and 
+-- then by account number.
+
+        SELECT C.customer_number,FIRSTNAME,account_number 
+            FROM customer_master C 
+                INNER JOIN account_master A ON C.customer_number=A.customer_number 
+                    WHERE DAY(account_opening_date)>15 
+                        order by customer_number;
+
+-- Write a query to display customer number, customer's first name, account number 
+-- where the account status is terminated.
+-- Display the records sorted in ascending order based on customer number and 
+-- then by account number
+
+        SELECT A.customer_number,firstname,account_number 
+            FROM customer_master C 
+                inner join account_master A ON A.customer_number=C.customer_number 
+                    where account_status='TERMINATED';
+            
+-- Write a query to display  the total number of  withdrawals and total number of deposits 
+-- being done by customer whose customer number ends with 001. 
+-- The query should display transaction type and the number of transactions. 
+-- Give an alias name as Trans_Count for number of transactions. 
+-- Display the records sorted in ascending order based on transaction type.
+
+        SELECT transaction_type,COUNT(transaction_type) as TRANS_COUNT
+            FROM transaction_details T 
+                inner join account_master A ON T.account_number = A.account_number 
+                    where customer_number like '%001' 
+                        group by transaction_type 
+	                        order by transaction_type;
+                        
+-- Write a query to display the number of customers who have registration 
+-- but no account in the bank.
+-- Give the alias name as Count_Customer for number of customers
+
+        SELECT COUNT(CUSTOMER_NUMBER) AS Count_Customer 
+            FROM customer_master 
+                where CUSTOMER_NUMBER 
+                    NOT IN(SELECT CUSTOMER_NUMBER FROM account_master);
+    
+-- Write a query to display account number and total amount deposited by each account holder
+-- ( Including the opening balance ). 
+-- Give the total amount deposited an alias name of Deposit_Amount.  
+-- Display the records in sorted order based on account number
+
+        SELECT A.account_number,opening_balance + sum(transaction_amount) AS Deposit_Amount
+            FROM account_master A 
+                inner join transaction_details T on A.account_number=T.account_number 
+                    where transaction_type='DEPOSIT'
+                        group by account_number 
+                            order by A.account_number;
+                            
+-- Write a query to display the number of accounts opened in each city .
+-- The Query should display Branch City  and number of accounts as No_of_Accounts.
+-- For the branch city where we don’t have any accounts opened display 0. 
+-- Display the records in sorted order based on branch city.
+
+        SELECT branch_city,COUNT(account_number) AS No_of_Accounts
+            FROM account_master A 
+                RIGHT JOIN branch_master B on A.branch_id = B.branch_id 
+                    GROUP BY branch_city order by branch_city;
+                    
+-- Write  a query to display the firstname of the customers who have more than 1 account. 
+-- Display the records in sorted order based on firstname.
+
+        SELECT firstname 
+            FROM customer_master C 
+                inner join account_master A on C.customer_number= A.customer_number
+                    group by A.customer_number 
+                        having count(A.customer_number)>1 
+                            order by firstname;
+                        
+-- Write a query to display the customer number, customer firstname, customer lastname 
+-- who has taken loan from more than 1 branch.
+-- Display the records sorted in order based on customer number.
+
+        SELECT C.customer_number,firstname,lastname 
+            FROM loan_details L 
+                INNER JOIN customer_master C ON C.customer_number = L.customer_number
+                    group by customer_number
+                        having count(L.customer_number)>1 
+                            order by customer_number;
+
+-- Write a query to display the customer’s number, customer’s firstname, customer’s city and 
+-- branch city where the city of the customer and city of the branch is different. 
+-- Display the records sorted in ascending order based on customer number.
+
+        SELECT C.customer_number,C.firstname,C.customer_city,B.branch_city
+            FROM customer_master C 
+                INNER JOIN account_master A ON C.customer_number = A.customer_number
+                    INNER JOIN branch_master B ON A.branch_id = B.branch_id
+                        WHERE customer_city!=branch_city 
+                            ORDER BY C.customer_number;
+
+-- Write a query to display the number of clients who have asked for loans but 
+-- they don’t have any account in the bank though they are registered customers. 
+-- Give the count an alias name of Count.
+
+        SELECT count(customer_number) AS COUNT 
+            FROM customer_master where customer_number
+                NOT IN (SELECT customer_number FROM account_master)
+                    AND customer_number IN (SELECT customer_number from loan_details);
