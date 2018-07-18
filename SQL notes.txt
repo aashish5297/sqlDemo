@@ -241,3 +241,167 @@ SELECT * FROM loan_details;
             FROM customer_master where customer_number
                 NOT IN (SELECT customer_number FROM account_master)
                     AND customer_number IN (SELECT customer_number from loan_details);
+		    
+
+
+----------------------------------------------------------------------------------------------------------------------
+							DAY 7/18/2018
+----------------------------------------------------------------------------------------------------------------------
+
+	DDL - Data definiton language (CREATE ALTER DROP TRUNCATE)	autocommit
+				{ Tables,	Views	}
+	
+	DML - Data Manipulation Language	( INSERT UPDATE DELETE	) undo
+					
+
+	DCL - Data Control Language (GRANT	REVOKE	)
+							
+	TCL - Transaction Control language	(ROLLBACK	COMMIT	SAVEPOINT	)
+	
+	DQL - Data Query ( SELECT	)
+					
+
+
+CREATE DATABASE DW031;
+
+USE DW031;
+
+CREATE TABLE STUDENT(
+    roll int,
+    name varchar(20)
+);       
+ 
+desc student;        -- displays table structure
+ 
+ALTER TABLE student 
+ add column dob date;
+ 
+ALTER TABLE student
+ change dob date_of_birth date;
+ 
+ALTER TABLE student
+ change name name varchar(30);
+ 
+ALTER TABLE student
+ add constraint primary key (name);
+ 
+create table test(
+    id int,
+    id2 int,
+    primary key (id,id2)
+);
+
+desc test;
+
+
+create table test2(
+    id int primary key auto_increment,
+    name varchar(20)
+);
+    
+desc test2;
+
+INSERT INTO TEST2(NAME) 
+VALUES('sharma');
+
+SELECT * FROM TEST2;
+
+use dw031;
+
+UPDATE test2
+set name='Sharma' where id=2 ;
+
+delete from test2 where name like 'sharma';
+rollback;
+
+
+-- GRANT and REVOKE
+
+	create user devil identified by 'dEVILs';
+
+	GRANT SELECT,INSERT,UPDATE,DELETE on database_name.table_name to user_name;
+			(*)
+
+	REVOKE SELECT,INSERT,UPDATE,DELETE on database_name.table_name from user_name;
+
+
+-- TRUNCATE and DROP
+		
+	TRUNCATE table test2;		-- deletes all records
+	
+	DROP table test2;		-- deletes the whole table
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+						NORMALIZATION
+----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------
+
+					SUBSTRING and SUBSTRING_INDEX
+
+	SELECT substr(column_name,start_position) from table_name;
+	
+	SELECT substr(column_name,start_position,end_position) from table_name;	
+
+	
+	SELECT substring_index(column_name,'@',position) FROM employees;        
+		-- Returns the substring before the 'position'th occurence of @
+
+	
+	SELECT concat(column_name1,column_name2) from table_name;
+
+	SELECT concat(column_name1,' ',column_name2) from table_name;
+
+----------------------------------------------------------------------------------------------------------------------
+		
+		select 7/9,round(7/9,2),ceil(7/9),floor(7/9);
+
+----------------------------------------------------------------------------------------------------------------------
+	-- DATE functions
+
+	select date('2101'-01-01)
+
+	select date('2101-01-01');
+    
+    select year(current_date());
+    select month(current_date());
+    select day(current_date());
+    
+    select last_day(current_date());
+    
+    select current_date(),current_date()+17;
+    
+    select current_date()-6,adddate(current_date(),14);
+
+---------------------------------------------------------------------------------------------------------------------
+
+			select ifnull(first_column,0)  -- if first_column is null returns 0 otherwise first_column1
+			select nullif(1,1)  -- if both are equal return NULL
+			select nullif(11,2) -- if both are not equal returns first_column		    
