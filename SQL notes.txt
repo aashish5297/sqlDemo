@@ -404,4 +404,231 @@ rollback;
 
 			select ifnull(first_column,0)  -- if first_column is null returns 0 otherwise first_column1
 			select nullif(1,1)  -- if both are equal return NULL
-			select nullif(11,2) -- if both are not equal returns first_column		    
+
+
+----------------------------------------------------------------------------------------------------------------------
+								19-July-2018	IF,IFNULL,COALESCE
+----------------------------------------------------------------------------------------------------------------------
+
+	use hr;
+
+	select first_name,commission_pct from employees;
+
+	select first_name,if(commission_pct is NULL,'No Commission', commission_pct) COMMISSION from employees;
+
+	select first_name,salary from employees;
+
+	select first_name,if(salary>10000,'Good','Not Good') from employees;
+
+	select first_name,ifnull(commission_pct,0) from employees;
+
+	use dw031;
+
+	create table customer
+	(	
+	    id int primary key auto_increment,
+	    name varchar(20) not null,
+	    mobile varchar(20),
+	    land_line varchar(20),
+	    email varchar(20),
+	    address varchar(20)
+	);
+
+	insert into customer(name,mobile) values ('Rustom Bavri','9876543210');
+    
+	insert into customer(name,land_line) values ('Harish chand','0120-4201858');
+
+	insert into customer(name,email) values ('Akash Chopra','chopra@hotmail.com');
+
+	insert into customer(name,address) values ('Ravi Shashtri','#23 VijayNagar');
+
+	insert into customer(name,mobile,land_line) values ('Kapil dev','9944115577',  '011-223366987 ');
+
+	insert into customer(name) values ('Sachin Tendulkar');
+
+	select * from customer;
+
+	select name, coalesce(mobile,land_line,email,address) contact from customer;
+	    -- coalesce displays first column if no data in first column then second and so on.
+    
+	insert into customer(name,address) values ('Rani','12,Thane,Mumbai,421301');
+    
+    	insert into customer(name,address) values ('ajay','12,3rd cross ,Chennai,606905');
+    
+    	insert into customer(name,address) values ('Teja','12,Hinjiwadi,Pune,411033');
+    
+	insert into customer(name,address) values ('Kiran','23,Lake park,Kolkata,700020');
+    
+    	insert into customer(name,address) values ('Uma','24,TVS col,Madurai,664051');
+    
+    	select substr(address,length(address)-5) from customer;
+    
+    	select substring_index(address,',',3) from customer;
+    
+    	-- Extract city from address
+	select substring_index(reverse(substring_index(reverse(address),',',2)),',',1) address 
+	    from customer;
+    
+    
+    
+    
+    	use hr;
+    
+    	select salary from employees order by salary desc limit 1 offset 2;
+        	    -- offset is starting from Nth record 
+	    select salary from employees order by salary desc limit 2,1;      
+	    -- here limit is the last number that you give
+    
+    	select max(salary) from employees;
+    
+    	select min(salary) from employees;
+    
+    	select avg(salary) from employees;
+    
+    	select count(*) from employees;
+    
+    	select sum(salary) from employees;
+
+	select department_id,sum(salary) 
+    		from employees                  -- employee salary
+		where salary>10000
+		group by department_id;
+    
+	select department_id,sum(salary) 
+	    from employees                  -- department salary
+	    group by department_id
+	    having sum(salary)>10000;
+    
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+									SWITCH CASE IN MYSQL
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+	
+	USE dw031;
+    
+    create table products
+    (
+        id int primary key auto_increment,
+        name varchar(50)
+        );
+    insert into products(name) values('G'),
+    ('KW'),
+    ('To'),
+    ('Bk'),
+    ('Bev'),
+    ('Cl'),
+    ('Me');
+    
+    select * from products;
+    -- case
+    select id,
+        case
+            when name like 'G' then 'Guruji'
+            when name like 'KW' then 'Kitchen Ware'
+            when name like 'To' then 'Tools'
+            when name like 'Bk' then 'Bakery'
+            when name like 'Bev' then 'Beverages'
+            when name like 'Cl' then 'Clothes'
+            when name like 'Me' then 'Media'
+        end Description
+    from products;
+    
+    
+    use hr;
+    select first_name,
+        case
+            when salary between 500 and 10000 then 'Good'
+            when salary between 10001 and 20000 then 'Not Bad'
+            when salary >20000 then 'Very Good'
+        end comments
+    from employees;
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+									JOINS
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	The concept to reterive multiple columns from two or more tables
+		types:- 
+			theta, where
+			
+			2000 ANSI JOIN
+		INNER JOIN
+			
+			equi	=
+			non-equi	> <			
+			self
+			natural
+
+		OUTER JOIN	
+			
+			cross	X
+			outer
+				left
+				right
+				full
+
+			j = t-1      -- join = number of tables - 1
+
+
+		SYNTAX --		SELECT columns,columns 
+					FROM table1 join table2
+					ON condition
+
+
+		  use hr;
+    
+  		  select * from employees;
+    
+    		select *  from departments;
+  
+  		-- EQUI JOIN
+			select first_name,department_name 
+			from employees join departments
+			on employees.department_id=departments.department_id;
+
+			select first_name,department_name 
+			    from employees e join departments d
+			    on e.department_id=d.department_id;
+    
+		    -- natural join 5 10 5
+			    select first_name,department_name 
+			    from employees natural join departments;
+    
+		    -- cross join 5 10 50
+			    select first_name,department_name 
+			    from employees cross join departments;
+    
+		    -- self join
+			    select emp.first_name Employee,mgr.first_name Manager
+			    from employees emp 
+			    join employees mgr
+			    on emp.manager_id=mgr.employee_id;
+    
+		    -- left outer
+    			    select first_name,department_name 
+     	 		    from employees e left join departments d
+			    on e.department_id=d.department_id;
+    
+    		    -- right outer
+    			    select first_name,department_name 
+  			    from employees e right join departments d
+  			    on e.department_id=d.department_id;
+    
+		select * from employees;
+    
+    		select * from jobs;
+    
+		    -- display the first name and the job title of all employees
+		    select first_name,job_title 
+		    from employees e
+		    join jobs j
+		    on e.job_id = j.job_id;
+    
+		    -- display the first name and city of the employees
+		    select first_name, city, country_name from employees e
+		    join departments d on e.department_id=d.department_id
+		    join locations l
+		    on l.location_id=d.location_id
+		    join countries c
+		    on l.country_id=c.country_id;select nullif(11,2) -- if both are not equal returns first_column		    
