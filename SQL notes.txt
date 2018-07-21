@@ -632,3 +632,107 @@ rollback;
 		    on l.location_id=d.location_id
 		    join countries c
 		    on l.country_id=c.country_id;select nullif(11,2) -- if both are not equal returns first_column		    
+
+
+----------------------------------------------------------------------------------------------------------------------
+					21-July-2018
+----------------------------------------------------------------------------------------------------------------------
+
+	set operators
+		union		--	display all values without duplicates			-- in mysql
+		union		--	display all values					-- in mysql
+	
+		minus		--	a -b							-- in oracle
+		intersect	--	common in a and b					-- in oracle
+	
+
+
+SYNTAX
+	first select
+	set
+	second select
+
+CONDITION	
+	1. both the select queries should carry equal number of columns
+
+	select id from emp
+	union					// wont work as it has unequal number of columns
+	select id,name from emp			
+
+	2. the columns in both the select query should have the same data types
+
+	select id from emp
+	union					//won't work differnt data types of columns
+	select name from dept
+
+--------------------------------------------------------------------------------------------------------------------
+						SUB-QUERIES
+--------------------------------------------------------------------------------------------------------------------
+
+	inner query or nested queries.
+	outer(inner)
+	
+	first the inner query works and reuturns an output to the outer query,
+	then the outer query works on the given input.
+
+	=
+	<
+	>
+	in
+	all
+	any
+	exists
+	not exists
+
+
+	CORRELATED SUBQUERIES
+	the outer query works first and then the inner query
+
+	INLINE VIEW
+	this query works like a subquery but can extract a column or a set of columns
+	from the query.
+		
+	SINGLE ROW SUB-QUERIES
+	
+	select first_name from employees
+	where salary=(select max(salary) from employees);
+
+	select first_name 
+	from employees 
+	where department_id=
+	(select department_id from departments 
+	where department_name='Sales');
+
+	select first_name from employees where
+	department_id in 
+	(select department_id from departments 
+	where department_name in ('Sales','it','SHIPPING'));
+
+	
+	-- display all the employee's first name those are earning more than average salary
+
+	select first_name from employees 
+	where salary>
+	(select avg(salary) from employees);
+
+	-- can be worked with create , insert, update, delete
+	-- create table using sub-query
+	
+	create table emp_sales
+	as
+	select * from employees where department_id=
+	(select department_id from departments 
+	where department_name like 'sales');
+
+	-- create an empty table with structure
+
+	create table emp_it
+	as
+	select * from employees where 1=2;
+
+	-- inserting records into an empty table
+	
+	insert into emp_it
+	select * from employees where department_id=60;
+
+	
