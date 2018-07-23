@@ -937,5 +937,245 @@ values('ISS008','E00006','I00018','2012-08-18','2019-04-17');
 insert into employee_issue_details
 values('ISS009','E00004','I00018','2013-04-18','2013-05-18');
 
+---------------------------------------------------------------------------------------------------------------------------------------
+				23-07-2018
+---------------------------------------------------------------------------------------------------------------------------------------
+show tables;
+desc employee_card_details;
+desc employee_issue_details;
+desc employee_master;
+desc item_master;
+desc loan_card_master;
 
+select * from item_master;
+select * from employee_master;
+select * from loan_card_master;
+select * from employee_issue_details;
+select * from employee_card_details;
+
+-- Write a query to display category and number of items in that category. 
+-- Give the count an alias name of Count_category. 
+-- Display the details on the sorted order of count in descending order
+
+select item_category,count(item_id) as Count_category 
+from item_master 
+group by item_category
+order by 2 desc;
+
+
+-- Write a query to display the number of employees in HR department. 
+-- Give the alias name as No_of_Employees
+
+select count(employee_id) as No_of_Employees 
+from employee_master
+where department='HR';
+
+
+-- Write a query to display employee id, employee name, designation and department for employees 
+-- who have never been issued an item as a loan from the company. 
+-- Display the records sorted in ascending order based on employee id
+
+select em.employee_id,employee_name,designation,department from employee_master em
+where em.employee_id NOT IN (select employee_id from employee_card_details ecd);
+
+
+-- Write a query to display the employee id, employee name who was issued an item 
+-- of highest valuation.
+-- In case of multiple records, display the records sorted in ascending order 
+-- based on employee id.
+-- [Hint Suppose an item called dinning table is of 22000 and that is the 
+-- highest price of the item that has been issued. So display the employee id and 
+-- employee name who issued dinning table whose price is 22000.]
+
+    select employee_id,employee_name from employee_master where employee_id=(
+    select employee_id from employee_issue_details where item_id=(
+    select item_id from item_master where item_valuation=(select max(item_valuation) from item_master where issue_status='Y')));
+    
+    -- Please follow instructions given below.
+    -- Write a query to display issue_id, employee_id, employee_name.
+    -- Display the records sorted in ascending order based on issue id
+
+    select eid.issue_id,eid.employee_id,employee_name from employee_issue_details eid 
+    join employee_master em on em.employee_id=eid.employee_id
+    order by 1;
+    
+    -- Write a query to display employee id, employee name who don’t have loan cards.
+    -- Display the records sorted in ascending order based on employee id.
+
+    select employee_id,employee_name 
+    from employee_master 
+    where employee_id not in (select distinct employee_id from employee_card_details)
+    order by employee_id;
+    
+    
+    -- Write a query to count the number of cards issued to an employee “Ram”.  
+    -- Give the count an alias name as No_of_Cards
+    
+    select count(employee_id) as No_of_Cards from employee_card_details 
+    where employee_id=
+    (select employee_id from employee_master where employee_name='Ram');
+
+
+    -- Write a query to display the count of customers who have gone for loan type stationary. 
+    -- Give the count an alias name as Count_stationary
+    
+    
+    select count(employee_id) Count_stationary from loan_card_master lcm
+    join employee_card_details ecd on lcm.loan_id=ecd.loan_id 
+    where loan_type= 'stationary';
+    
+    
+    -- Write a query to display the employee id, employee name and number of items issued to them. 
+    -- Give the number of items an alias name as Count. Display the details in descending order of count and then 
+    -- by employee id in ascending order. Consider only employees who have been issued atleast 1 item
+    
+    select em.employee_id,em.employee_name,count(eid.item_id) as Count 
+    from employee_issue_details eid
+    join employee_master em on em.employee_id=eid.employee_id
+    group by em.employee_id
+    having count(eid.item_id)>=1
+    order by 3 desc,1 asc;
+    
+    
+    -- Write a query to display the employee id, employee name who was issued an item of minimum valuation.
+    -- In case of multiple records, display them sorted in ascending order based on emp loyee id.
+    -- [Hint Suppose an item called pen is of rupees 20 and that is the lowest price. 
+    -- So display the employee id and employee name who issued pen where the valuation is 20.
+    
+    select em.employee_id,em.employee_name from employee_master em
+    join employee_issue_details eid on em.employee_id=eid.employee_id
+    where eid.item_id IN (
+    select item_id from item_master where item_valuation=(select min(item_valuation) from employee_issue_details eid
+    join item_master im on eid.item_id=im.item_id))
+    order by 1;
+    
+    
+    -- Write a query to display the employee id, employee name and total valuation of the product issued to each employee.
+    -- Give the alias name as TOTAL_VALUATION.
+    -- Display the records sorted in ascending order based on employee id.
+    -- Consider only employees who have been issued atleast 1 item
+    
+    select em.employee_id,em.employee_name,sum(item_valuation) as TOTAL_VALUATION from employee_master em
+    join employee_issue_details eid on em.employee_id=eid.employee_id
+    join item_master im on im.item_id=eid.item_id
+    group by em.employee_id 
+    order by 1;
+    
+    -- Write a query to display distinct employee id, employee name who kept the item issued for more than a year.
+    -- Hint: Use Date time function to calculate the difference between item issue and return date. 
+    -- Display the records only if it is more than 365 Days.
+    -- Display the records sorted in ascending order based on employee id
+
+    select distinct em.employee_id,em.employee_name from employee_issue_details eid
+    join employee_master em on em.employee_id=eid.employee_id where addDate(issue_date,365)<return_date
+    order by 1;
+    
+    
+    -- Write a query to display employee id, employee name and count of items of those who asked 
+    -- for more than 1 furniture. Give the alias name for count of items as COUNT_ITEMS.
+    -- Display the records sorted in ascending order on employee id.
+
+    select em.employee_id,em.employee_name,count(im.item_id) as COUNT_ITEMS from employee_issue_details eid
+    join employee_master em on eid.employee_id = em.employee_id
+    join item_master im on im.item_id=eid.item_id
+    where im.item_category='furniture'
+    group by em.employee_id
+    having COUNT_ITEMS>1
+    order by 1;
+    
+    -- Write a query to display the number of men & women Employees. 
+    -- The query should display the gender and number of Employees as No_of_Employees. 
+    -- Display the records sorted in ascending order based on gender
+    
+    select gender,count(employee_id) as No_of_Employees from employee_master
+    group by gender order by gender;
+    
+    -- Write a query to display employee id, employee name who joined the company after 2005. 
+    -- Display the records sorted in ascending order based on employee id
+    
+    select employee_id,employee_name from 
+    employee_master em where year(date_of_joining)>2005
+    order by 1;
+    
+    -- Write a query to get the number of items of the furniture category issued and not issued. 
+    -- The query should display issue status and the number of furniture as No_of_Furnitures.
+    -- Display the records sorted in ascending order based on issue_status
+
+    select issue_status,count(item_id) as No_of_furniture from item_master im
+    where  item_category = 'furniture'
+    group by issue_status
+    order by issue_status;
+    
+    
+    -- Write a query to find the number of items in each category, make and description. 
+    -- The Query should display Item Category, Make, description and the number of items as No_of_Items. 
+    -- Display the records in ascending order based on Item Category, then by item make and then by item description
+    
+    select item_category,item_make,item_description,count(item_description)
+    from item_master
+    group by item_description,item_make
+    order by item_category,item_make,item_description;
+    
+    
+    -- Write a query to display employee id, employee name, item id and item description of employees 
+    -- who were issued item(s)
+    -- in the month of January 2013. Display the records sorted in order based on employee id and then by item id 
+    -- in ascending order
+    
+    select em.employee_id,employee_name,im.item_id,item_description from employee_issue_details eid
+    join employee_master em on em.employee_id=eid.employee_id
+    join item_master im on im.item_id=eid.item_id
+    where eid.issue_date like '2013-01%'
+    order by employee_id,item_id;
+    
+    
+    -- Write a query to display the employee id, employee name and count of item category of the employees 
+    -- who have been issued items in at least 2 different categories.
+    -- Give the alias name for category count as COUNT_CATEGORY.
+    -- Display the records sorted in ascending order based on employee id
+
+    select em.employee_id,em.employee_name,count(im.item_category) as COUNT_CATEGORY from employee_master em   
+    join employee_issue_details eid on eid.employee_id=em.employee_id
+    join item_master im on im.item_id=eid.item_id
+    GROUP BY im.item_category
+    having count(im.item_category)<=2
+    order by em.employee_id;
+    
+    -- Write a query to display the item id , item description which was never issued to any employee. 
+    -- Display the records sorted in ascending order based on item id
+    
+    select im.item_id,im.item_description from item_master im
+    where im.item_id not in (select Item_id from employee_issue_details)
+    order by 1;
+    
+    -- Write a query to display the employee id, employee name and  total valuation; 
+    -- for the employees who has issued minimum total valuation of the product.  
+    -- Give the alias name for total valuation as TOTAL_VALUATION.
+    -- [Hint: Suppose an employee E00019 issued item of price 5000, 10000, 12000 and 
+    -- E00020 issue item of price 2000, 7000 and 1000. So the valuation of items taken by E00019 is 27000 and
+    -- for E00020 it is 10000. So the employee id, employee name of E00020 should be displayed. ]
+
+    select em.employee_id,em.employee_name,sum(item_valuation) TOTAL_VALUATION
+    from employee_master em
+    join employee_issue_details eid on em.employee_id=eid.employee_id
+    join item_master im on im.item_id=eid.item_id
+    group by em.employee_id
+    order by 3 limit 1;
+    
+    -- Write a query to display the employee id, employee name, card issue date and card valid date.
+    -- Order by employee name and then by card valid date. 
+    -- Give the alias name to display the card valid date as CARD_VALID_DATE.
+    -- [Hint:  Validity in years for the loan card is given in loan_card_master table. 
+    -- Validity date is calculated by adding number of years in the loan card issue date. 
+    -- If the duration of year is zero then display AS 'No Validity Date'. ]
+
+    select em.employee_id,em.employee_name,ecd.card_issue_date,(select 
+    CASE lcm.duration_in_years
+        WHEN 0 then 'No Validity Date'
+        ELSE adddate(card_issue_date, INTERVAL lcm.duration_in_years year) 
+        END) as CARD_VALID_DATE
+    from employee_master em
+    join employee_card_details ecd on ecd.employee_id=em.employee_id
+    join loan_card_master lcm on lcm.loan_id=ecd.loan_id
+    order by employee_name,4;
 
