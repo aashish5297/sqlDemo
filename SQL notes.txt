@@ -1179,3 +1179,31 @@ where em.employee_id NOT IN (select employee_id from employee_card_details ecd);
     join loan_card_master lcm on lcm.loan_id=ecd.loan_id
     order by employee_name,4;
 
+	-- Write a query to display the employee id, employee name who have not issued with any item  in the year 2013. 
+    -- Hint: Exclude those employees  who  was  never issued with any of the items in all the years. 
+    -- Display the records sorted in ascending order based on employee id
+    
+    SELECT distinct em.employee_id,employee_name from employee_master em
+    join employee_issue_details eid on em.employee_id=eid.employee_id
+    where year(issue_date)!=2013;
+    
+    -- Write a query to display issue id, employee id, employee name, item id, item description and issue date.  
+    -- Display the data in descending order of date and then by issue id in ascending order
+    
+    select issue_id,em.employee_id,em.employee_name,im.item_id,item_description,issue_date from employee_issue_details eid
+    join employee_master em on eid.employee_id=em.employee_id
+    JOIN item_master im on im.item_id=eid.item_id
+    order by issue_date desc,issue_id asc;
+    
+    -- Write a query to display the employee id, employee name and total valuation for employee who has issued 
+    -- maximum total valuation of the product; Give the alias name for total valuation as TOTAL_VALUATION;
+    -- [Hint: Suppose an employee E00019 issued item of price 5000, 10000, 12000 and E00020 issue item of price 2000,
+    -- 7000, and 1000. So the valuation of items taken by E00019 is 27000 and for E00020 it is 10000. 
+    -- So the employee id, employee name and total valuation of E00019 should display.
+
+    select em.employee_id,em.employee_name,sum(item_valuation) as TOTAL_VALUATION 
+    from employee_master em
+    join employee_issue_details eid on eid.employee_id=em.employee_id
+    join item_master im on im.item_id=eid.item_id
+    group by em.employee_id
+    order by 3 desc limit 1;
